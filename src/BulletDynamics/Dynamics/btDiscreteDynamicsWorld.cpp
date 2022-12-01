@@ -863,7 +863,7 @@ void btDiscreteDynamicsWorld::createPredictiveContactsInternal(btRigidBody** bod
 			if (getDispatchInfo().m_useContinuous && body->getCcdSquareMotionThreshold() && body->getCcdSquareMotionThreshold() < squareMotion)
 			{
 				BT_PROFILE("predictive convexSweepTest");
-				if (body->getCollisionShape()->isConvex())
+				if (body->getCollisionShape()->isConvex() || body->getCollisionShape()->getShapeType() == BroadphaseNativeTypes::COMPOUND_SHAPE_PROXYTYPE)
 				{
 					gNumClampedCcdMotions++;
 #ifdef PREDICTIVE_CONTACT_USE_STATIC_ONLY
@@ -965,7 +965,7 @@ void btDiscreteDynamicsWorld::integrateTransformsInternal(btRigidBody** bodies, 
 			if (getDispatchInfo().m_useContinuous && body->getCcdSquareMotionThreshold() && body->getCcdSquareMotionThreshold() < squareMotion)
 			{
 				BT_PROFILE("CCD motion clamping");
-				if (body->getCollisionShape()->isConvex())
+				if (body->getCollisionShape()->isConvex() || body->getCollisionShape()->getShapeType() == BroadphaseNativeTypes::COMPOUND_SHAPE_PROXYTYPE)
 				{
 					gNumClampedCcdMotions++;
 #ifdef USE_STATIC_ONLY

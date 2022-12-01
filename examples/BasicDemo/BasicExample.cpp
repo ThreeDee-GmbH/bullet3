@@ -20,7 +20,7 @@ subject to the following restrictions:
 #define ARRAY_SIZE_X 3
 #define ARRAY_SIZE_Z 3
 
-#include <iostream>
+#include "Bullet3Common/b3Logging.h"
 #include "LinearMath/btQuickprof.h"
 
 #include "LinearMath/btVector3.h"
@@ -110,10 +110,10 @@ void BasicExample::initPhysics()
 				{
 					startTransform.setOrigin(btVector3(
 						btScalar(0.25 * i),
-						btScalar(2 + .25 * k),
+						btScalar(50 + .25 * k),
 						btScalar(0.25 * j)));
 
-					btRigidBody* rb = createRigidBody(mass, startTransform, colShape);
+					btRigidBody* rb = createRigidBody(mass, startTransform, compoundShape);
 					rb->setCcdMotionThreshold(btScalar(.1));
 					rb->setCcdSweptSphereRadius(btScalar(.04));
 				}
@@ -128,7 +128,7 @@ void BasicExample::renderScene()
 {
 	CommonRigidBodyBase::renderScene();
 
-	CProfileManager::dumpAll();
+	// CProfileManager::dumpAll();
 }
 
 CommonExampleInterface* BasicExampleCreateFunc(CommonExampleOptions& options)
