@@ -16,9 +16,12 @@ subject to the following restrictions:
 #include "BasicExample.h"
 
 #include "btBulletDynamicsCommon.h"
-#define ARRAY_SIZE_Y 5
-#define ARRAY_SIZE_X 5
-#define ARRAY_SIZE_Z 5
+#define ARRAY_SIZE_Y 3
+#define ARRAY_SIZE_X 3
+#define ARRAY_SIZE_Z 3
+
+#include <iostream>
+#include "LinearMath/btQuickprof.h"
 
 #include "LinearMath/btVector3.h"
 #include "LinearMath/btAlignedObjectArray.h"
@@ -56,7 +59,7 @@ void BasicExample::initPhysics()
 		m_dynamicsWorld->getDebugDrawer()->setDebugMode(btIDebugDraw::DBG_DrawWireframe + btIDebugDraw::DBG_DrawContactPoints);
 
 	///create a few basic rigid bodies
-	btBoxShape* groundShape = createBoxShape(btVector3(btScalar(50.), btScalar(50.), btScalar(50.)));
+	btBoxShape* groundShape = createBoxShape(btVector3(btScalar(50.), btScalar(.00001), btScalar(50.)));
 
 	//groundShape->initializePolyhedralFeatures();
 	//btCollisionShape* groundShape = new btStaticPlaneShape(btVector3(0,1,0),50);
@@ -65,7 +68,7 @@ void BasicExample::initPhysics()
 
 	btTransform groundTransform;
 	groundTransform.setIdentity();
-	groundTransform.setOrigin(btVector3(0, -50, 0));
+	groundTransform.setOrigin(btVector3(0, 0, 0));
 
 	{
 		btScalar mass(0.);
@@ -78,8 +81,13 @@ void BasicExample::initPhysics()
 
 		btBoxShape* colShape = createBoxShape(btVector3(.1, .1, .1));
 
+		btCompoundShape* compoundShape = new btCompoundShape();
+		btTransform trans = btTransform::getIdentity();
+		compoundShape->addChildShape(trans, colShape);
+
 		//btCollisionShape* colShape = new btSphereShape(btScalar(1.));
 		m_collisionShapes.push_back(colShape);
+		m_collisionShapes.push_back(compoundShape);
 
 		/// Create Dynamic Objects
 		btTransform startTransform;
@@ -92,7 +100,7 @@ void BasicExample::initPhysics()
 
 		btVector3 localInertia(0, 0, 0);
 		if (isDynamic)
-			colShape->calculateLocalInertia(mass, localInertia);
+			compoundShape->calculateLocalInertia(mass, localInertia);
 
 		for (int k = 0; k < ARRAY_SIZE_Y; k++)
 		{
@@ -101,11 +109,13 @@ void BasicExample::initPhysics()
 				for (int j = 0; j < ARRAY_SIZE_Z; j++)
 				{
 					startTransform.setOrigin(btVector3(
-						btScalar(0.2 * i),
-						btScalar(2 + .2 * k),
-						btScalar(0.2 * j)));
+						btScalar(0.25 * i),
+						btScalar(2 + .25 * k),
+						btScalar(0.25 * j)));
 
-					createRigidBody(mass, startTransform, colShape);
+					btRigidBody* rb = createRigidBody(mass, startTransform, colShape);
+					rb->setCcdMotionThreshold(btScalar(.1));
+					rb->setCcdSweptSphereRadius(btScalar(.04));
 				}
 			}
 		}
@@ -117,6 +127,8 @@ void BasicExample::initPhysics()
 void BasicExample::renderScene()
 {
 	CommonRigidBodyBase::renderScene();
+
+	CProfileManager::dumpAll();
 }
 
 CommonExampleInterface* BasicExampleCreateFunc(CommonExampleOptions& options)
