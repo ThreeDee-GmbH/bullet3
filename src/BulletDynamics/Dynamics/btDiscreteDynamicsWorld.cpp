@@ -476,6 +476,9 @@ void btDiscreteDynamicsWorld::internalSingleStepSimulation(btScalar timeStep)
 
 	getSolverInfo().m_timeStep = timeStep;
 
+	///update vehicle simulation
+	updateActions(timeStep);
+
 	///solve contact and other joint constraints
 	solveConstraints(getSolverInfo());
 
@@ -484,9 +487,6 @@ void btDiscreteDynamicsWorld::internalSingleStepSimulation(btScalar timeStep)
 	///integrate transforms
 
 	integrateTransforms(timeStep);
-
-	///update vehicle simulation
-	updateActions(timeStep);
 
 	updateActivationState(timeStep);
 
