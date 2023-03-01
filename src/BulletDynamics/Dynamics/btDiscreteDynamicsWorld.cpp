@@ -904,7 +904,7 @@ void btDiscreteDynamicsWorld::createPredictiveContactsInternal(btRigidBody** bod
 					convexSweepTest(&tmpSphere, OffsetBodyTrans, modifiedPredictedTrans, sweepResults);
 					if (sweepResults.hasHit() && (sweepResults.m_closestHitFraction < 1.f))
 					{
-						btVector3 distVec = (predictedTrans.getOrigin() - body->getWorldTransform().getOrigin()) * sweepResults.m_closestHitFraction;
+						btVector3 distVec = (OffsetPredictedTrans.getOrigin() - OffsetBodyTrans.getOrigin()) * sweepResults.m_closestHitFraction;
 						btScalar distance = distVec.dot(-sweepResults.m_hitNormalWorld);
 
 						btMutexLock(&m_predictiveManifoldsMutex);
@@ -912,7 +912,7 @@ void btDiscreteDynamicsWorld::createPredictiveContactsInternal(btRigidBody** bod
 						m_predictiveManifolds.push_back(manifold);
 						btMutexUnlock(&m_predictiveManifoldsMutex);
 
-						btVector3 worldPointB = body->getWorldTransform().getOrigin() + distVec;
+						btVector3 worldPointB = OffsetBodyTrans.getOrigin() + distVec;
 						btVector3 localPointB = sweepResults.m_hitCollisionObject->getWorldTransform().inverse() * worldPointB;
 
 						btManifoldPoint newPoint(btVector3(0, 0, 0), localPointB, sweepResults.m_hitNormalWorld, distance);
@@ -922,7 +922,7 @@ void btDiscreteDynamicsWorld::createPredictiveContactsInternal(btRigidBody** bod
 						btManifoldPoint& pt = manifold->getContactPoint(index);
 						pt.m_combinedRestitution = 0;
 						pt.m_combinedFriction = gCalculateCombinedFrictionCallback(body, sweepResults.m_hitCollisionObject);
-						pt.m_positionWorldOnA = body->getWorldTransform().getOrigin();
+						pt.m_positionWorldOnA = OffsetBodyTrans.getOrigin();
 						pt.m_positionWorldOnB = worldPointB;
 					}
 				}
