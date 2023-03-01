@@ -47,7 +47,7 @@ btCollisionObject::btCollisionObject()
 	  m_hitFraction(btScalar(1.)),
 	  m_ccdSweptSphereRadius(btScalar(0.)),
 	  m_ccdMotionThreshold(btScalar(0.)),
-	  m_ccdCenterOffset(btScalar(0.), btScalar(0.), btScalar(0.)),
+	  m_ccdCenterOffset(0.f, 0.f, 0.f),
 	  m_checkCollideWith(false),
 	  m_updateRevision(0)
 {

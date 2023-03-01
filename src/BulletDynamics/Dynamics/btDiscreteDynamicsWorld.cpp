@@ -46,8 +46,6 @@ subject to the following restrictions:
 
 #include "LinearMath/btSerializer.h"
 
-#include "Bullet3Common/b3Logging.h"
-
 #if 0
 btAlignedObjectArray<btVector3> debugContacts;
 btAlignedObjectArray<btVector3> debugNormals;

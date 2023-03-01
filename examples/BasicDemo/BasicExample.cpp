@@ -116,6 +116,7 @@ void BasicExample::initPhysics()
 					btRigidBody* rb = createRigidBody(mass, startTransform, compoundShape);
 					rb->setCcdMotionThreshold(btScalar(.1));
 					rb->setCcdSweptSphereRadius(btScalar(.04));
+					rb->setCcdCenterOffset(btVector3(0., -1, 0));
 				}
 			}
 		}
