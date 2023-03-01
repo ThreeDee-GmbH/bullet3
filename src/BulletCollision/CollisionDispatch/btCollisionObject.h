@@ -113,6 +113,9 @@ protected:
 	/// Don't do continuous collision detection if the motion (in one step) is less then m_ccdMotionThreshold
 	btScalar m_ccdMotionThreshold;
 
+	/// Offset from CoM in local space to use when sweeping the sphere
+	btVector3 m_ccdCenterOffset;
+
 	/// If some object should have elaborate collision filtering by sub-classes
 	int m_checkCollideWith;
 
@@ -522,6 +525,17 @@ public:
 	void setCcdMotionThreshold(btScalar ccdMotionThreshold)
 	{
 		m_ccdMotionThreshold = ccdMotionThreshold;
+	}
+
+	const btVector3& getCcdCenterOffset() const
+	{
+		return m_ccdCenterOffset;
+	}
+
+	/// CCD proxy sphere is swept from this offset instead of CoM not being the shape's geometrical center
+	void setCcdCenterOffset(const btVector3& ccdCenterOffset)
+	{
+		m_ccdCenterOffset = ccdCenterOffset;
 	}
 
 	///users can point to their objects, userPointer is not used by Bullet

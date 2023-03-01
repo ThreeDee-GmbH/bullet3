@@ -46,6 +46,8 @@ subject to the following restrictions:
 
 #include "LinearMath/btSerializer.h"
 
+#include "Bullet3Common/b3Logging.h"
+
 #if 0
 btAlignedObjectArray<btVector3> debugContacts;
 btAlignedObjectArray<btVector3> debugNormals;
@@ -866,6 +868,11 @@ void btDiscreteDynamicsWorld::createPredictiveContactsInternal(btRigidBody** bod
 				if (body->getCollisionShape()->isConvex() || body->getCollisionShape()->getShapeType() == BroadphaseNativeTypes::COMPOUND_SHAPE_PROXYTYPE)
 				{
 					gNumClampedCcdMotions++;
+					// Adjust sphere sweep locations by the optional center offset
+					const btVector3& OptionalCenterOffset = body->getCcdCenterOffset();
+					const btTransform OffsetBodyTrans(body->getWorldTransform().getBasis(), body->getWorldTransform() * OptionalCenterOffset);
+					const btTransform OffsetPredictedTrans(predictedTrans.getBasis(), predictedTrans * OptionalCenterOffset);
+					
 #ifdef PREDICTIVE_CONTACT_USE_STATIC_ONLY
 					class StaticOnlyCallback : public btClosestNotMeConvexResultCallback
 					{
@@ -885,7 +892,7 @@ void btDiscreteDynamicsWorld::createPredictiveContactsInternal(btRigidBody** bod
 
 					StaticOnlyCallback sweepResults(body, body->getWorldTransform().getOrigin(), predictedTrans.getOrigin(), getBroadphase()->getOverlappingPairCache(), getDispatcher());
 #else
-					btClosestNotMeConvexResultCallback sweepResults(body, body->getWorldTransform().getOrigin(), predictedTrans.getOrigin(), getBroadphase()->getOverlappingPairCache(), getDispatcher());
+					btClosestNotMeConvexResultCallback sweepResults(body, OffsetBodyTrans.getOrigin(), OffsetPredictedTrans.getOrigin(), getBroadphase()->getOverlappingPairCache(), getDispatcher());
 #endif
 					//btConvexShape* convexShape = static_cast<btConvexShape*>(body->getCollisionShape());
 					btSphereShape tmpSphere(body->getCcdSweptSphereRadius());  //btConvexShape* convexShape = static_cast<btConvexShape*>(body->getCollisionShape());
@@ -893,10 +900,10 @@ void btDiscreteDynamicsWorld::createPredictiveContactsInternal(btRigidBody** bod
 
 					sweepResults.m_collisionFilterGroup = body->getBroadphaseProxy()->m_collisionFilterGroup;
 					sweepResults.m_collisionFilterMask = body->getBroadphaseProxy()->m_collisionFilterMask;
-					btTransform modifiedPredictedTrans = predictedTrans;
+					btTransform modifiedPredictedTrans = OffsetPredictedTrans;
 					modifiedPredictedTrans.setBasis(body->getWorldTransform().getBasis());
 
-					convexSweepTest(&tmpSphere, body->getWorldTransform(), modifiedPredictedTrans, sweepResults);
+					convexSweepTest(&tmpSphere, OffsetBodyTrans, modifiedPredictedTrans, sweepResults);
 					if (sweepResults.hasHit() && (sweepResults.m_closestHitFraction < 1.f))
 					{
 						btVector3 distVec = (predictedTrans.getOrigin() - body->getWorldTransform().getOrigin()) * sweepResults.m_closestHitFraction;
@@ -968,6 +975,11 @@ void btDiscreteDynamicsWorld::integrateTransformsInternal(btRigidBody** bodies, 
 				if (body->getCollisionShape()->isConvex() || body->getCollisionShape()->getShapeType() == BroadphaseNativeTypes::COMPOUND_SHAPE_PROXYTYPE)
 				{
 					gNumClampedCcdMotions++;
+					// Adjust sphere sweep locations by the optional center offset
+					const btVector3& OptionalCenterOffset = body->getCcdCenterOffset();
+					const btTransform OffsetBodyTrans(body->getWorldTransform().getBasis(), body->getWorldTransform() * OptionalCenterOffset);
+					const btTransform OffsetPredictedTrans(predictedTrans.getBasis(), predictedTrans * OptionalCenterOffset);
+
 #ifdef USE_STATIC_ONLY
 					class StaticOnlyCallback : public btClosestNotMeConvexResultCallback
 					{
@@ -987,7 +999,7 @@ void btDiscreteDynamicsWorld::integrateTransformsInternal(btRigidBody** bodies, 
 
 					StaticOnlyCallback sweepResults(body, body->getWorldTransform().getOrigin(), predictedTrans.getOrigin(), getBroadphase()->getOverlappingPairCache(), getDispatcher());
 #else
-					btClosestNotMeConvexResultCallback sweepResults(body, body->getWorldTransform().getOrigin(), predictedTrans.getOrigin(), getBroadphase()->getOverlappingPairCache(), getDispatcher());
+					btClosestNotMeConvexResultCallback sweepResults(body, OffsetBodyTrans.getOrigin(), OffsetPredictedTrans.getOrigin(), getBroadphase()->getOverlappingPairCache(), getDispatcher());
 #endif
 					//btConvexShape* convexShape = static_cast<btConvexShape*>(body->getCollisionShape());
 					btSphereShape tmpSphere(body->getCcdSweptSphereRadius());  //btConvexShape* convexShape = static_cast<btConvexShape*>(body->getCollisionShape());
@@ -995,10 +1007,10 @@ void btDiscreteDynamicsWorld::integrateTransformsInternal(btRigidBody** bodies, 
 
 					sweepResults.m_collisionFilterGroup = body->getBroadphaseProxy()->m_collisionFilterGroup;
 					sweepResults.m_collisionFilterMask = body->getBroadphaseProxy()->m_collisionFilterMask;
-					btTransform modifiedPredictedTrans = predictedTrans;
+					btTransform modifiedPredictedTrans = OffsetPredictedTrans;
 					modifiedPredictedTrans.setBasis(body->getWorldTransform().getBasis());
 
-					convexSweepTest(&tmpSphere, body->getWorldTransform(), modifiedPredictedTrans, sweepResults);
+					convexSweepTest(&tmpSphere, OffsetBodyTrans, modifiedPredictedTrans, sweepResults);
 					if (sweepResults.hasHit() && (sweepResults.m_closestHitFraction < 1.f))
 					{
 						//printf("clamped integration to hit fraction = %f\n",fraction);
