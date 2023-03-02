@@ -16,9 +16,9 @@ subject to the following restrictions:
 #include "BasicExample.h"
 
 #include "btBulletDynamicsCommon.h"
-#define ARRAY_SIZE_Y 3
-#define ARRAY_SIZE_X 3
-#define ARRAY_SIZE_Z 3
+#define ARRAY_SIZE_Y 1
+#define ARRAY_SIZE_X 1
+#define ARRAY_SIZE_Z 1
 
 #include "Bullet3Common/b3Logging.h"
 #include "LinearMath/btQuickprof.h"
@@ -115,8 +115,8 @@ void BasicExample::initPhysics()
 
 					btRigidBody* rb = createRigidBody(mass, startTransform, compoundShape);
 					rb->setCcdMotionThreshold(btScalar(.1));
-					rb->setCcdSweptSphereRadius(btScalar(.04));
-					rb->setCcdCenterOffset(btVector3(0., -1, 0));
+					rb->setCcdSweptSphereRadius(btScalar(.1));
+					rb->setCcdCenterOffset(btVector3(0.0, 0.0, 0.0));
 				}
 			}
 		}

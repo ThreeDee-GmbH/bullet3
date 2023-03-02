@@ -913,6 +913,7 @@ void btDiscreteDynamicsWorld::createPredictiveContactsInternal(btRigidBody** bod
 						btMutexUnlock(&m_predictiveManifoldsMutex);
 
 						btVector3 worldPointB = OffsetBodyTrans.getOrigin() + distVec;
+						worldPointB -= sweepResults.m_hitNormalWorld * tmpSphere.getRadius(); // subtract sphere radius so contact point is actually on other object's surface
 						btVector3 localPointB = sweepResults.m_hitCollisionObject->getWorldTransform().inverse() * worldPointB;
 
 						btManifoldPoint newPoint(btVector3(0, 0, 0), localPointB, sweepResults.m_hitNormalWorld, distance);
